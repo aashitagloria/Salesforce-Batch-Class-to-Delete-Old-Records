@@ -1,0 +1,28 @@
+global class DeleteOldRecordsBatch implemnents Database.Batchable<sObject>, Database.Stateful
+{
+    String query = 'SELECT id, CreatedDate FROM Custom_Object__c';
+    String noOfMonths;
+    
+    // Constructor that takes the parameter of number of months after which the record should be deleted
+    global DeleteOldRecordsBatch(String noOfMonths)
+    {
+        query += 'WHERE CreatedDate < LAST_N_MONTHS:'+noOfMonths; 
+    }
+
+    global Database.QueryLocator start(Database.BatchableContext bc)
+    {
+        return Database.getQueryLocator(query);
+    }
+
+    global void execute(Database.BatchableContext bc, List<Custom_Object__c> listOfRecords)
+    {
+        if(listOfRecords != NULL && !listOfRecords.isEmpty())
+        {
+            Database.deleteResult[] listOfDeeletedRecords = Database.delete(listOfRecords, false);
+        }
+    }
+
+    global void finish(Database.BatchableContext BC)
+    {     
+    }
+}
